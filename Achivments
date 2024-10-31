@@ -1,0 +1,308 @@
+{
+  "import": [
+    "React, { useState, useEffect } from 'react'",
+    "View, Text, StyleSheet, Image, ScrollView from 'react-native'",
+    "AsyncStorage from '@react-native-async-storage/async-storage'"
+  ],
+  "export": {
+    "default": "AchievementsScreen"
+  },
+  "AchievementsScreen": {
+    "state": {
+      "achievements": {
+        "tap100": {
+          "completed": false,
+          "progress": 0
+        },
+        "tap500": {
+          "completed": false,
+          "progress": 0
+        },
+        "draw30": {
+          "completed": false,
+          "progress": 0
+        }
+      }
+    },
+    "useEffect": [
+      {
+        "function": "loadAchievements",
+        "dependencies": []
+      }
+    ],
+    "functions": {
+      "loadAchievements": {
+        "async": true,
+        "body": [
+          "const storedAchievements = await AsyncStorage.getItem('achievements');",
+          "if (storedAchievements) {",
+          "  setAchievements(JSON.parse(storedAchievements));",
+          "}"
+        ]
+      },
+      "updateAchievements": {
+        "async": true,
+        "parameters": ["newAchievements"],
+        "body": [
+          "setAchievements(newAchievements);",
+          "await AsyncStorage.setItem('achievements', JSON.stringify(newAchievements));"
+        ]
+      },
+      "incrementTap": {
+        "body": [
+          "setAchievements((prevAchievements) => {",
+          "  const newAchievements = { ...prevAchievements };",
+          "  newAchievements.tap100.progress += 1;",
+          "  newAchievements.tap500.progress += 1;",
+          "  if (newAchievements.tap100.progress >= 100) {",
+          "    newAchievements.tap100.completed = true;",
+          "  }",
+          "  if (newAchievements.tap500.progress >= 500) {",
+          "    newAchievements.tap500.completed = true;",
+          "  }",
+          "  updateAchievements(newAchievements);",
+          "  return newAchievements;",
+          "});"
+        ]
+      },
+      "incrementDraw": {
+        "body": [
+          "setAchievements((prevAchievements) => {",
+          "  const newAchievements = { ...prevAchievements };",
+          "  newAchievements.draw30.progress += 1;",
+          "  if (newAchievements.draw30.progress >= 30) {",
+          "    newAchievements.draw30.completed = true;",
+          "  }",
+          "  updateAchievements(newAchievements);",
+          "  return newAchievements;",
+          "});"
+        ]
+      }
+    },
+    "return": {
+      "component": "ScrollView",
+      "props": {
+        "style": "styles.container"
+      },
+      "children": [
+        {
+          "component": "Text",
+          "props": {
+            "style": "styles.title"
+          },
+          "children": "Achievements"
+        },
+        {
+          "component": "View",
+          "props": {
+            "style": [
+              "styles.achievementContainer",
+              {
+                "condition": "achievements[key].completed",
+                "style": "styles.completedContainer"
+              },
+              {
+                "condition": "!achievements[key].completed",
+                "style": "styles.inProgressContainer"
+              }
+            ]
+          },
+          "children": [
+            {
+              "component": "Image",
+              "props": {
+                "source": "require('../image/kubok.png')",
+                "style": [
+                  "styles.achievementImage",
+                  {
+                    "condition": "achievements[key].completed",
+                    "style": "styles.completedImage"
+                  },
+                  {
+                    "condition": "!achievements[key].completed",
+                    "style": "styles.inProgressImage"
+                  }
+                ]
+              }
+            },
+            {
+              "component": "View",
+              "props": {
+                "style": "styles.achievementInfo"
+              },
+              "children": [
+                {
+                  "component": "Text",
+                  "props": {
+                    "style": [
+                      "styles.achievementText",
+                      {
+                        "condition": "achievements[key].completed",
+                        "style": "styles.completedText"
+                      },
+                      {
+                        "condition": "!achievements[key].completed",
+                        "style": "styles.inProgressText"
+                      }
+                    ]
+                  },
+                  "children": {
+                    "condition": "achievements[key].completed",
+                    "text": "Completed"
+                  },
+                  "else": {
+                    "text": "In Progress"
+                  }
+                },
+                {
+                  "component": "Text",
+                  "props": {
+                    "style": [
+                      "styles.achievementText",
+                      {
+                        "condition": "achievements[key].completed",
+                        "style": "styles.completedText"
+                      },
+                      {
+                        "condition": "!achievements[key].completed",
+                        "style": "styles.inProgressText"
+                      }
+                    ]
+                  },
+                  "children": {
+                    "condition": "key === 'tap100'",
+                    "text": "Tap 100 times in Game2"
+                  },
+                  "else": {
+                    "condition": "key === 'tap500'",
+                    "text": "Tap 500 times in Game2"
+                  },
+                  "else": {
+                    "text": "Draw 30 images"
+                  }
+                },
+                {
+                  "component": "View",
+                  "props": {
+                    "style": "styles.progressBarContainer"
+                  },
+                  "children": [
+                    {
+                      "component": "View",
+                      "props": {
+                        "style": [
+                          "styles.progressBar",
+                          {
+                            "width": "`${progressPercentage}%`",
+                            "backgroundColor": {
+                              "condition": "achievements[key].completed",
+                              "color": "#FF69B4"
+                            },
+                            "else": {
+                              "color": "#D3D3D3"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "component": "Text",
+                  "props": {
+                    "style": [
+                      "styles.achievementText",
+                      {
+                        "condition": "achievements[key].completed",
+                        "style": "styles.completedText"
+                      },
+                      {
+                        "condition": "!achievements[key].completed",
+                        "style": "styles.inProgressText"
+                      }
+                    ]
+                  },
+                  "children": "`${achievements[key].progress} / ${key === 'tap100' ? 100 : key === 'tap500' ? 500 : 30} (${progressPercentage.toFixed(0)}%)`"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "styles": {
+    "container": {
+      "flex": 1,
+      "padding": 20,
+      "backgroundColor": "#FFF0F5"
+    },
+    "title": {
+      "fontSize": 24,
+      "fontWeight": "bold",
+      "color": "#FF69B4",
+      "marginBottom": 20
+    },
+    "achievementContainer": {
+      "flexDirection": "row",
+      "alignItems": "center",
+      "marginBottom": 20,
+      "borderRadius": 10,
+      "padding": 10,
+      "shadowColor": "#000",
+      "shadowOffset": {
+        "width": 0,
+        "height": 2
+      },
+      "shadowOpacity": 0.2,
+      "shadowRadius": 2,
+      "elevation": 2
+    },
+    "completedContainer": {
+      "backgroundColor": "#FFFFFF"
+    },
+    "inProgressContainer": {
+      "backgroundColor": "#D3D3D3"
+    },
+    "achievementImage": {
+      "width": 50,
+      "height": 50,
+      "marginRight": 10
+    },
+    "completedImage": {
+      "tintColor": "#FF69B4"
+    },
+    "inProgressImage": {
+      "tintColor": "#808080"
+    },
+    "achievementInfo": {
+      "flex": 1
+    },
+    "achievementText": {
+      "fontSize": 16
+    },
+    "completedText": {
+      "color": "#333333"
+    },
+    "inProgressText": {
+      "color": "#808080"
+    },
+    "progressBarContainer": {
+      "width": "100%",
+      "height": 20,
+      "backgroundColor": "#E0E0E0",
+      "borderRadius": 10,
+      "marginVertical": 10
+    },
+    "progressBar": {
+      "height": "100%",
+      "borderRadius": 10
+    },
+    "trophyImage": {
+      "width": 100,
+      "height": 100,
+      "alignSelf": "center",
+      "marginTop": 20
+    }
+  }
+}
